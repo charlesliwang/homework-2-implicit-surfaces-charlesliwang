@@ -1,4 +1,4 @@
-import {vec4, mat4} from 'gl-matrix';
+import {vec2, vec4, mat4} from 'gl-matrix';
 import Drawable from './Drawable';
 import {gl} from '../../globals';
 
@@ -24,6 +24,9 @@ class ShaderProgram {
   attrPos: number;
 
   unifView: WebGLUniformLocation;
+  unifViewInv: WebGLUniformLocation;
+  unifWindow: WebGLUniformLocation;
+  unifTime: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -41,6 +44,9 @@ class ShaderProgram {
 
     // TODO: add other attributes here
     this.unifView   = gl.getUniformLocation(this.prog, "u_View");
+    this.unifViewInv   = gl.getUniformLocation(this.prog, "u_ViewInv");
+    this.unifWindow   = gl.getUniformLocation(this.prog, "u_Window");
+    this.unifTime   = gl.getUniformLocation(this.prog, "u_Time");
   }
 
   use() {
@@ -65,6 +71,34 @@ class ShaderProgram {
 
     if (this.attrPos != -1) gl.disableVertexAttribArray(this.attrPos);
 
+  }
+
+  setViewMatrix(vp: mat4) {
+    this.use();
+    if (this.unifView !== -1) {
+      gl.uniformMatrix4fv(this.unifView, false, vp);
+    }
+
+    if (this.unifViewInv !== -1) {
+      let viewinv: mat4 = mat4.create();
+      mat4.invert(viewinv, vp);
+      gl.uniformMatrix4fv(this.unifViewInv, false, viewinv);
+    }
+  }
+
+  setWindow(window: vec2) {
+    this.use();
+    if (this.unifWindow !== -1) {
+      console.log(window);
+      gl.uniform2f(this.unifWindow, window[0],window[1]);
+    }
+  }
+
+  setTime(time: vec4) {
+    this.use();
+    if (this.unifTime !== -1) {
+      gl.uniform4fv(this.unifTime, time);
+    }
   }
 };
 

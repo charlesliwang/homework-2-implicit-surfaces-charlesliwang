@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import {vec2, vec3, vec4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -13,6 +13,8 @@ const controls = {
 };
 
 let screenQuad: Square;
+let time = 0;
+let cycle = 300;
 
 function main() {
   // Initial display for framerate
@@ -68,6 +70,10 @@ function main() {
     // TODO: send uniforms to shader
 
     // March!
+    raymarchShader.setViewMatrix(camera.viewMatrix);
+    time++;
+    let v4 = vec4.fromValues(time/cycle,time%cycle,time,cycle);
+    raymarchShader.setTime(v4);
     raymarchShader.draw(screenQuad);
 
     // TODO: more shaders to layer / process the first one? (either via framebuffers or blending)
@@ -82,11 +88,15 @@ function main() {
     setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
+    let w = vec2.fromValues(window.innerWidth, window.innerHeight);
+    raymarchShader.setWindow(w);
   }, false);
 
   setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
   camera.updateProjectionMatrix();
+  let w = vec2.fromValues(window.innerWidth, window.innerHeight);
+  raymarchShader.setWindow(w);
 
   // Start the render loop
   tick();
