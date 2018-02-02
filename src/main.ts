@@ -9,6 +9,7 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
+  'Duplicates' : false,
   // TODO: add any controls you want
 };
 
@@ -27,6 +28,7 @@ function main() {
 
   // TODO: add any controls you need to the gui
   const gui = new DAT.GUI();
+  gui.add(controls, 'Duplicates', false );
   // E.G. gui.add(controls, 'tesselations', 0, 8).step(1);
 
   // get canvas and webgl context
@@ -72,7 +74,11 @@ function main() {
     // March!
     raymarchShader.setViewMatrix(camera.viewMatrix);
     time++;
-    let v4 = vec4.fromValues(time/cycle,time%cycle,time,cycle);
+    let dup = 0.0;
+    if(controls.Duplicates) {
+      dup = 1.0;
+    }
+    let v4 = vec4.fromValues(time/cycle,time%cycle,time,dup);
     raymarchShader.setTime(v4);
     raymarchShader.draw(screenQuad);
 
